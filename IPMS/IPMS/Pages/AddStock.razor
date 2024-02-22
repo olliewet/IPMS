@@ -1,0 +1,102 @@
+﻿@page "/addstock"
+@using IPMS.Data
+@using IPMS.Models.DTOs
+@using IPMS.Services
+@inject StockService StockService
+
+<PageTitle>Stock Inventory</PageTitle>
+<h3>AddStock</h3>
+
+<button class="btn btn-primary" @onclick="() => ShowAddForm(!_ShowAddForm)">Show Add Form</button>
+
+@if (errorMessage != "")
+{
+    <div class="alert alert-info" role="alert">
+        @errorMessage
+    </div>
+}
+@if (_ShowAddForm)
+{
+<form @onsubmit="HandleSubmit">
+      <div class="form-group">
+    <label>
+                Name:
+                <input class="form-control"  type="text" @bind="@Stock.Name" />
+    </label>
+        </div>
+    <br />
+      <div class="form-group">
+    <label>
+        Quantity:
+                <input class="form-control"  type="number" @bind="@Stock.Quantity" />
+    </label>
+        </div>
+    <br />
+      <div class="form-group">
+    <label>
+        Cost:
+                <input class="form-control"  type="number" step="0.01" @bind="@Stock.Cost" />
+    </label>
+        </div>
+    <br />
+        <button class="btn btn-primary"  type="submit">Submit</button>
+</form>
+}
+
+@if(AvaliableStock.Count != 0)
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Cost</th>
+                <th>QTY</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var stockItem in AvaliableStock)
+            {
+                <tr>
+                    <td>@stockItem.Name</td>
+                    <td>@stockItem.Cost</td>
+                    <td>@stockItem.Quantity</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    List<StockDto> AvaliableStock = new();
+    StockDto Stock { get; set; } = new StockDto();
+    string errorMessage = "";
+    bool _ShowAddForm = false;
+    protected override async Task OnInitializedAsync()
+    {
+        AvaliableStock = await StockService.GetAllStock();
+    }
+
+    void ShowAddForm(bool showForm)
+    {
+        _ShowAddForm = showForm;
+        StateHasChanged();
+    }
+
+    // Method to handle form submission
+    async Task HandleSubmit()
+    {
+        // Call your API passing the StockDto object
+        // Example:
+        // ApiService.CreateStock(Stock);
+        var result = await StockService.AddStockItem(Stock);
+        if (!result)
+        {
+            errorMessage = "Failed to Add Item";
+        }
+
+        AvaliableStock = await StockService.GetAllStock();
+        Stock = new StockDto();
+        _ShowAddForm = false;
+        StateHasChanged();
+    }
+}

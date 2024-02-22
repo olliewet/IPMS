@@ -1,5 +1,7 @@
 using IPMS.Data;
 using IPMS.Interfaces;
+using IPMS.Repositories;
+using IPMS.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.EntityFrameworkCore;
@@ -11,7 +13,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddSingleton<WeatherForecastService>();
-builder.Services.AddTransient<IStockManagementRepository, IStockManagementRepository>();
+builder.Services.AddTransient<IStockManagementRepository, StockManagementRepository>();
+builder.Services.AddScoped<StockService, StockService>();
 builder.Services.AddDbContext<ApplicationDBContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 var app = builder.Build();
 
