@@ -14,19 +14,51 @@ namespace IPMS.Repositories
             _context = context;
         }
 
-        public Task<bool> AddProduct(StockDto product)
+        public async Task<bool> AddProduct(ProductDto product)
         {
-            throw new NotImplementedException();
+            try
+            {
+                _context.ProductManagement.Add(ProductMapper.GetEfromDto(product));
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception ex) { }
+            {
+                return false;
+            }
         }
 
-        public Task<List<StockDto>> GetAllProducts()
+        public async Task<List<ProductDto>> GetAllProducts()
         {
-            throw new NotImplementedException();
+            List<ProductDto> result = new List<ProductDto>();
+            try
+            {
+                var list = _context.ProductManagement;
+                foreach (var item in list)
+                {
+                    result.Add(ProductMapper.GetDtoFromEFModel(item));
+                }
+                await _context.SaveChangesAsync();
+                return result;
+            }
+            catch (Exception ex) { }
+            {
+                return result;
+            }
         }
 
-        public Task<bool> UpdateProduct(StockDto product)
+        public async Task<bool> UpdateProduct(ProductDto product)
         {
-            throw new NotImplementedException();
+            try
+            {
+                _context.ProductManagement.Update(ProductMapper.GetEfromDto(product));
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception ex) { }
+            {
+                return false;
+            }
         }
     }
 }

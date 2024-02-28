@@ -1,2 +1,10 @@
 
 IPMS/IPMS/bin/Debug/net8.0/appsettings.Development.json
+IPMS/IPMS/bin/Debug/net8.0/appsettings.json
+*.vsidx
+IPMS/.vs/IPMS/config/applicationhost.config
+IPMS/.vs/IPMS/DesignTimeBuild/.dtbcache.v2
+IPMS/.vs/IPMS/v17/.futdcache.v2
+*.dll
+*.pdb
+IPMS/IPMS/bin/Debug/net8.0/IPMS.exe
