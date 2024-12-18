@@ -14,7 +14,10 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddSingleton<WeatherForecastService>();
 builder.Services.AddTransient<IStockManagementRepository, StockManagementRepository>();
+builder.Services.AddTransient<IProductManagementRepository,ProductManagementRepository>();
+builder.Services.AddTransient<IBillOfMatrialsManagementRepository, BillOfMatrialsManagementRepository> ();
 builder.Services.AddScoped<StockService, StockService>();
+builder.Services.AddScoped<ProductService, ProductService>();
 builder.Services.AddDbContext<ApplicationDBContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 var app = builder.Build();
 

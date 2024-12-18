@@ -7,18 +7,25 @@ namespace IPMS.Services
     {
         private readonly IStockManagementRepository _stockRepo;
         private readonly IProductManagementRepository _productRepo;
+        private readonly IBillOfMatrialsManagementRepository _bomRepo;
 
-        public ProductService(IStockManagementRepository stockRepository, IProductManagementRepository productRepository)
+        public ProductService(IStockManagementRepository stockRepository, IProductManagementRepository productRepository, IBillOfMatrialsManagementRepository bomRepository)
         {
             //Add Validation Checking
             _stockRepo = stockRepository;
             _productRepo = productRepository;
+            _bomRepo = bomRepository;
         }
         public async Task<bool> AddProduct(ProductDto productItem)
         {
             try
             {
-                await _productRepo.AddProduct(productItem);
+                var id = await _productRepo.AddProduct(productItem);
+                foreach(var matrial in productItem.Materials)
+                {
+                    matrial.ProductId = id.ToString();
+                    await _bomRepo.AddBom(matrial);
+                }
                 return true;
             }
             catch (Exception ex)
@@ -26,7 +33,7 @@ namespace IPMS.Services
                 return false;
             }
         }
-        public async Task<bool> UpdateStockItem(ProductDto productItem)
+        public async Task<bool> UpdateProductItem(ProductDto productItem)
         {
             try
             {
@@ -39,7 +46,7 @@ namespace IPMS.Services
             }
         }
 
-        public async Task<List<ProductDto>> GetAllProduct(ProductDto productItem)
+        public async Task<List<ProductDto>> GetAllProducts()
         {
             try
             {
@@ -50,16 +57,7 @@ namespace IPMS.Services
                 //Looping through each product 
                 foreach (var product in products)
                 {
-                    //Getting the materials from the SKU
-                    var individualMaterials = product.LinkedMaterials.Split(",");
-                    foreach(var id in individualMaterials)
-                    {
-                        var foundMaterial = materials.FirstOrDefault(t => t.Equals(id));
-                        if(foundMaterial != null)
-                        {
-                            product.Materials.Add(foundMaterial);
-                        }                     
-                    }
+                    product.Materials = await _bomRepo.GetAllBomsFromId(product.Id.ToString());
                 }
 
                 return products;
@@ -68,6 +66,21 @@ namespace IPMS.Services
             {
                 return new();
             }
+        }
+
+        private decimal GetCost(List<StockDto> stockDtos)
+        {
+            decimal totalCost = 0;
+            foreach (var stock in stockDtos)
+            {
+                totalCost += stock.Cost;
+            }
+            return totalCost;
+        }
+        //
+        private int GetQuantity(List<StockDto> stockDtos)
+        {
+            return 0;
         }
     }
 }

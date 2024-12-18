@@ -2,49 +2,45 @@
 using IPMS.Helpers;
 using IPMS.Interfaces;
 using IPMS.Models.DTOs;
+using IPMS.Models.EF;
 
 namespace IPMS.Repositories
 {
-    public class ProductManagementRepository : IProductManagementRepository
+    public class BillOfMatrialsManagementRepository : IBillOfMatrialsManagementRepository
     {
         ApplicationDBContext _context;
 
-        public ProductManagementRepository(ApplicationDBContext context)
+        public BillOfMatrialsManagementRepository(ApplicationDBContext context)
         {
             _context = context;
         }
 
-        public async Task<int> AddProduct(ProductDto product)
+        public async Task<bool> AddBom(BomDto bom)
         {
             try
             {
-                var entity = ProductMapper.GetEfromDto(product);
-
-                // Add the entity to the context
-                _context.ProductManagement.Add(entity);
-
-                // Save changes to the database
+                _context.BomManagement.Add(BomMapper.GetEfromDto(bom));
                 await _context.SaveChangesAsync();
-
-                // Return the generated ID
-                return entity.Id;
-       
+                return true;
             }
             catch (Exception ex) { }
             {
-                return 0;
+                return false;
             }
         }
 
-        public async Task<List<ProductDto>> GetAllProducts()
+        public async Task<List<BomDto>> GetAllBomsFromId(string id)
         {
-            List<ProductDto> result = new List<ProductDto>();
+            List<BomDto> result = new();
             try
             {
-                var list = _context.ProductManagement;
+                var list = _context.BomManagement;
                 foreach (var item in list)
                 {
-                    result.Add(ProductMapper.GetDtoFromEFModel(item));
+                    if(item.ProductId == id)
+                    {
+                        result.Add(BomMapper.GetDtoFromEFModel(item));
+                    }            
                 }
                 await _context.SaveChangesAsync();
                 return result;
@@ -55,11 +51,11 @@ namespace IPMS.Repositories
             }
         }
 
-        public async Task<bool> UpdateProduct(ProductDto product)
+        public async Task<bool> UpdateBom(BomDto bom)
         {
             try
             {
-                _context.ProductManagement.Update(ProductMapper.GetEfromDto(product));
+                _context.BomManagement.Update(BomMapper.GetEfromDto(bom));
                 await _context.SaveChangesAsync();
                 return true;
             }

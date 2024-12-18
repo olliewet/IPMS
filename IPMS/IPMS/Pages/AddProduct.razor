@@ -1,0 +1,121 @@
+﻿@page "/addproduct"
+@using IPMS.Data
+@using IPMS.Models.DTOs
+@using IPMS.Services
+@inject ProductService productService
+@inject StockService stockService
+
+<PageTitle>Stock Inventory</PageTitle>
+<h3>Add Product</h3>
+
+<button class="btn btn-primary" @onclick="() => ShowAddForm(!_ShowAddForm)">Show Add Form</button>
+
+@if (errorMessage != "")
+{
+    <div class="alert alert-info" role="alert">
+        @errorMessage
+    </div>
+}
+@if (_ShowAddForm)
+{
+    <form @onsubmit="HandleSubmit">
+        <div class="form-group">
+            <label>
+                SKU:
+                <input class="form-control" type="text" @bind="@Product.SKU" />
+            </label>
+        </div>
+        <br />
+  
+        @foreach(var stock in Stock)
+        {
+            <div class="form-group">
+                <label>
+                    <button class="btn btn-primary" type="button"  @onclick="() => AddStockToProduct(stock)">Add @stock.Name to Product</button>
+                </label>
+            </div>
+        }
+        <br />
+        <button class="btn btn-primary" type="submit">Submit</button>
+    </form>
+}
+@if (Products.Count != 0)
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>SKU</th>
+                <th>Cost</th>
+                <th>Sold Price</th>
+                <th>Quantity</th>
+                <th>View Matrials</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var stockItem in Products)
+            {
+                <tr>
+                    <td>@stockItem.SKU</td>        
+                    <td>@stockItem.QuantitySold</td>
+                    <td>@stockItem.QuantityAvaliable</td>
+                    <td><button class="btn btn-primary">View</button></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+@code {
+    List<ProductDto> Products = new();
+    List<StockDto> Stock = new();
+    ProductDto Product { get; set; } = new ProductDto();
+    private bool _ShowAddForm = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Products = await productService.GetAllProducts();
+        Stock = await stockService.GetAllStock();
+    }
+    void AddStockToProduct(StockDto stock)
+    {
+        var matrial = Product.Materials.FirstOrDefault(m => m.Id == stock.Id);
+        if (matrial == null) // Check if the material is null
+        {
+            Product.Materials.Add(new BomDto()
+                {
+                    Id = stock.Id,
+                    Name = stock.Name
+                });
+        }
+        else
+        {
+            Product.Materials.Remove(matrial);
+        }
+    }
+    public int Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public int Quantity { get; set; }
+    public string ProductId { get; set; } = string.Empty; //Links to a product
+    string errorMessage = "";
+    void ShowAddForm(bool showForm)
+    {
+        _ShowAddForm = showForm;
+        StateHasChanged();
+    }
+
+    async Task HandleSubmit()
+    {
+        // Call your API passing the StockDto object
+        // Example:
+        // ApiService.CreateStock(Stock);
+        var result = await productService.AddProduct(Product);
+        if (!result)
+        {
+            errorMessage = "Failed to Add Item";
+        }
+
+        Products = await productService.GetAllProducts();
+        Product = new ProductDto();
+        _ShowAddForm = false;
+        StateHasChanged();
+    }
+}

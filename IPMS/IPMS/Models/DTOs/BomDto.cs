@@ -1,8 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace IPMS.Models.EF
+﻿namespace IPMS.Models.DTOs
 {
-    public class BillOfMaterials
+    public class BomDto
     {
         public int Id { get; set; }
         public string Name { get; set; } = string.Empty;

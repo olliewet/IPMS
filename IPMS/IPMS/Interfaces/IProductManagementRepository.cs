@@ -5,8 +5,8 @@ namespace IPMS.Interfaces
 {
     public interface IProductManagementRepository
     {
-        Task<bool> AddProduct(StockDto product);
-        Task<bool> UpdateProduct(StockDto product);
-        Task<List<StockDto>> GetAllProducts();
+        Task<int> AddProduct(ProductDto product);
+        Task<bool> UpdateProduct(ProductDto product);
+        Task<List<ProductDto>> GetAllProducts();
     }
 }
