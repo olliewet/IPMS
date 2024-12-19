@@ -19,8 +19,14 @@ namespace IPMS.Repositories
         {
             try
             {
-                _context.BomManagement.Add(BomMapper.GetEfromDto(bom));
+                var entity = BomMapper.GetEfromDto(bom);
+
+                // Add the entity to the context
+                _context.BomManagement.Add(entity);
+
+                // Save changes to the database
                 await _context.SaveChangesAsync();
+
                 return true;
             }
             catch (Exception ex) { }
@@ -48,6 +54,28 @@ namespace IPMS.Repositories
             catch (Exception ex) { }
             {
                 return result;
+            }
+        }
+
+        public async Task<bool> RemoveBom(BomDto bom)
+        {
+            try
+            {
+                var entity = await _context.BomManagement.FindAsync(bom.Id);
+
+                if (entity == null)
+                {
+                    // Handle the case where the entity does not exist
+                    return false;
+                }
+
+                _context.BomManagement.Remove(entity);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception ex) { }
+            {
+                return false;
             }
         }
 

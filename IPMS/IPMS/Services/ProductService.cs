@@ -22,7 +22,7 @@ namespace IPMS.Services
             {
                 var id = await _productRepo.AddProduct(productItem);
                 foreach(var matrial in productItem.Materials)
-                {
+                {            
                     matrial.ProductId = id.ToString();
                     await _bomRepo.AddBom(matrial);
                 }
@@ -67,7 +67,24 @@ namespace IPMS.Services
                 return new();
             }
         }
-
+        public async Task<bool> RemoveProduct(ProductDto productItem)
+        {
+            try
+            {
+                var result = await _productRepo.RemoveProduct(productItem);
+                
+                foreach(var item in productItem.Materials)
+                {
+                    await _bomRepo.RemoveBom(item);
+                }
+      
+                return result;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
         private decimal GetCost(List<StockDto> stockDtos)
         {
             decimal totalCost = 0;

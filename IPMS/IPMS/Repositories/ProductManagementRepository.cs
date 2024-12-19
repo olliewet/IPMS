@@ -2,6 +2,7 @@
 using IPMS.Helpers;
 using IPMS.Interfaces;
 using IPMS.Models.DTOs;
+using System.Text.RegularExpressions;
 
 namespace IPMS.Repositories
 {
@@ -33,6 +34,33 @@ namespace IPMS.Repositories
             catch (Exception ex) { }
             {
                 return 0;
+            }
+        }
+        public async Task<bool> RemoveProduct(ProductDto product)
+        {
+            try
+            {
+     
+                var entity = await _context.ProductManagement.FindAsync(product.Id);
+
+                if (entity == null)
+                {
+                    // Handle the case where the entity does not exist
+                    return false;
+                }
+
+                // Remove the entity
+                _context.ProductManagement.Remove(entity);
+
+                // Save changes to the database
+                await _context.SaveChangesAsync();
+
+                return true;
+
+            }
+            catch (Exception ex) { }
+            {
+                return false;
             }
         }
 

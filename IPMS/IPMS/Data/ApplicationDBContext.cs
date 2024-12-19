@@ -20,8 +20,10 @@ namespace IPMS.Data
             modelBuilder.Entity<StockManagement>()
                .Property(e => e.Id)
                .ValueGeneratedOnAdd();
+    
             modelBuilder.Entity<BillOfMaterials>()
-            .HasNoKey();
+                .Property(e => e.Id)
+                .ValueGeneratedOnAdd(); // Ensures the database generates the value
         }
 
         public DbSet<ProductManagement> ProductManagement { get; set; }

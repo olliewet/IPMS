@@ -1,4 +1,5 @@
 ﻿@page "/addproduct"
+@using BlazorBootstrap
 @using IPMS.Data
 @using IPMS.Models.DTOs
 @using IPMS.Services
@@ -8,8 +9,8 @@
 <PageTitle>Stock Inventory</PageTitle>
 <h3>Add Product</h3>
 
-<button class="btn btn-primary" @onclick="() => ShowAddForm(!_ShowAddForm)">Show Add Form</button>
-
+<Modal @ref="modal" />
+<button class="btn btn-primary" @onclick="() => ShowAddForm(!_ShowAddForm)">Add Product</button>
 @if (errorMessage != "")
 {
     <div class="alert alert-info" role="alert">
@@ -26,19 +27,31 @@
             </label>
         </div>
         <br />
-  
-        @foreach(var stock in Stock)
-        {
-            <div class="form-group">
-                <label>
-                    <button class="btn btn-primary" type="button"  @onclick="() => AddStockToProduct(stock)">Add @stock.Name to Product</button>
-                </label>
-            </div>
-        }
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Matrial Name</th>
+                    <th>Quantity Require</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var stock in StockForProduct)
+                {
+                    <tr>
+                        <td>@stock.Name</td>
+                        <td> 
+                            <input class="form-control" type="number" @bind="@stock.QuantityForProduct" /> 
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>     
         <br />
         <button class="btn btn-primary" type="submit">Submit</button>
     </form>
 }
+
 @if (Products.Count != 0)
 {
     <table class="table">
@@ -46,19 +59,26 @@
             <tr>
                 <th>SKU</th>
                 <th>Cost</th>
-                <th>Sold Price</th>
+                <th>Amount of Items Sold</th>
                 <th>Quantity</th>
-                <th>View Matrials</th>
+                <th>Matrials</th>
+                <th>Remove</th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var stockItem in Products)
+            @foreach (var productDto in Products)
             {
                 <tr>
-                    <td>@stockItem.SKU</td>        
-                    <td>@stockItem.QuantitySold</td>
-                    <td>@stockItem.QuantityAvaliable</td>
-                    <td><button class="btn btn-primary">View</button></td>
+                    <td>@productDto.SKU</td>
+                    <td>@productDto.Cost</td>
+                    <td>@productDto.QuantitySold</td>
+                    <td>@productDto.QuantityAvaliable</td>
+                    <td>
+                        <button class="btn btn-primary" @onclick="() => ShowMatrialsComponent(productDto.Materials,productDto.SKU)">View</button>
+                    </td>
+                    <td>
+                        <button class="btn btn-danger" @onclick="() => RemoveProduct(productDto)">Remove</button>
+                    </td>
                 </tr>
             }
         </tbody>
@@ -67,46 +87,86 @@
 @code {
     List<ProductDto> Products = new();
     List<StockDto> Stock = new();
+    List<AvaliableStock> StockForProduct = new();
+    List<AvaliableStock> SelectedStock = new();
     ProductDto Product { get; set; } = new ProductDto();
     private bool _ShowAddForm = false;
 
     protected override async Task OnInitializedAsync()
     {
-        Products = await productService.GetAllProducts();
-        Stock = await stockService.GetAllStock();
+        await RefreshData();
     }
-    void AddStockToProduct(StockDto stock)
+
+    private Modal modal = default!;
+
+    private async Task OnShowModalClick()
     {
-        var matrial = Product.Materials.FirstOrDefault(m => m.Id == stock.Id);
-        if (matrial == null) // Check if the material is null
+        await modal.ShowAsync();
+    }
+
+    private async Task OnHideModalClick()
+    {
+        await modal.HideAsync();
+    }
+
+    async void UpdateAvaliableStock()
+    {
+        Stock = await stockService.GetAllStock();
+        StockForProduct = new();
+
+        foreach(var stock in Stock)
         {
-            Product.Materials.Add(new BomDto()
-                {
-                    Id = stock.Id,
-                    Name = stock.Name
-                });
+            StockForProduct.Add(new()
+            {
+                Id = stock.Id,
+                Name = stock.Name
+            });
         }
-        else
-        {
-            Product.Materials.Remove(matrial);
-        }
+    }
+
+
+    async void RemoveProduct(ProductDto product)
+    {
+        await productService.RemoveProduct(product);
+        await RefreshData();
+        StateHasChanged();
+    }
+    async Task RefreshData()
+    {
+        Products = await productService.GetAllProducts();
+        UpdateAvaliableStock();
     }
     public int Id { get; set; }
     public string Name { get; set; } = string.Empty;
     public int Quantity { get; set; }
     public string ProductId { get; set; } = string.Empty; //Links to a product
     string errorMessage = "";
+    
     void ShowAddForm(bool showForm)
     {
         _ShowAddForm = showForm;
         StateHasChanged();
     }
 
+    private async Task ShowMatrialsComponent(List<BomDto> matrials, string productName)
+    {
+        var parameters = new Dictionary<string, object>();
+        parameters.Add("Matrials", matrials);
+        await modal.ShowAsync<Components.ViewMatrialsComponent>(title: $"Matrials for {productName}", parameters: parameters);
+    }
     async Task HandleSubmit()
     {
-        // Call your API passing the StockDto object
-        // Example:
-        // ApiService.CreateStock(Stock);
+        SelectedStock = StockForProduct.Where(s => s.QuantityForProduct > 0).ToList();
+        foreach(var selected in SelectedStock)
+        {
+            Product.Materials.Add(new()
+                {
+                    Id = new(),
+                    Name = selected.Name,
+                    Quantity = selected.QuantityForProduct
+                });
+        }
+
         var result = await productService.AddProduct(Product);
         if (!result)
         {
@@ -117,5 +177,12 @@
         Product = new ProductDto();
         _ShowAddForm = false;
         StateHasChanged();
+    }
+
+    public class AvaliableStock
+    {
+        public int Id { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public int QuantityForProduct{ get; set; }
     }
 }

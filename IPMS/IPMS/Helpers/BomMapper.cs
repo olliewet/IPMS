@@ -10,7 +10,6 @@ namespace IPMS.Helpers
         {
             return new BomDto()
             {
-                Id = ef.Id,
                 Name = ef.Name,
                 ProductId = ef.ProductId,
                 Quantity = ef.Quantity
@@ -20,7 +19,7 @@ namespace IPMS.Helpers
         {
             return new BillOfMaterials()
             {
-                Id = dto.Id,
+
                 Name = dto.Name,
                 ProductId = dto.ProductId,
                 Quantity = dto.Quantity

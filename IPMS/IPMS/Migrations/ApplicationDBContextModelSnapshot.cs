@@ -25,7 +25,10 @@ namespace IPMS.Migrations
             modelBuilder.Entity("IPMS.Models.EF.BillOfMaterials", b =>
                 {
                     b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -37,6 +40,8 @@ namespace IPMS.Migrations
 
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
+
+                    b.HasKey("Id");
 
                     b.ToTable("BomManagement");
                 });

@@ -1,3 +1,4 @@
+using BlazorBootstrap;
 using IPMS.Data;
 using IPMS.Interfaces;
 using IPMS.Repositories;
@@ -18,6 +19,7 @@ builder.Services.AddTransient<IProductManagementRepository,ProductManagementRepo
 builder.Services.AddTransient<IBillOfMatrialsManagementRepository, BillOfMatrialsManagementRepository> ();
 builder.Services.AddScoped<StockService, StockService>();
 builder.Services.AddScoped<ProductService, ProductService>();
+builder.Services.AddBlazorBootstrap();
 builder.Services.AddDbContext<ApplicationDBContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 var app = builder.Build();
 

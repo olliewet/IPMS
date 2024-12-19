@@ -7,6 +7,7 @@ namespace IPMS.Interfaces
     {
         Task<int> AddProduct(ProductDto product);
         Task<bool> UpdateProduct(ProductDto product);
+        Task<bool> RemoveProduct(ProductDto product);
         Task<List<ProductDto>> GetAllProducts();
     }
 }
