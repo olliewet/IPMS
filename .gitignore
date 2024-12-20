@@ -8,3 +8,5 @@ IPMS/.vs/IPMS/v17/.futdcache.v2
 *.dll
 *.pdb
 IPMS/IPMS/bin/Debug/net8.0/IPMS.exe
+IPMS/IPMS/obj/Debug/net7.0/.NETCoreApp,Version=v7.0.AssemblyAttributes.cs
+IPMS/IPMS/obj/Debug/net7.0/IPMS.AssemblyInfo.cs

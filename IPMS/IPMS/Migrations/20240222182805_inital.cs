@@ -6,26 +6,23 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace IPMS.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class inital : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "InventoryManagement",
+                name: "BillOfMaterials",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<int>(type: "int", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Cost = table.Column<float>(type: "real", nullable: false),
-                    QuantitySold = table.Column<int>(type: "int", nullable: false),
-                    QuantityAvaliable = table.Column<int>(type: "int", nullable: false),
-                    SKU = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Cost = table.Column<int>(type: "int", nullable: false),
+                    Quantity = table.Column<int>(type: "int", nullable: false),
+                    ProductId = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_InventoryManagement", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -50,12 +47,28 @@ namespace IPMS.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    QuantitySold = table.Column<int>(type: "int", nullable: false),
+                    QuantityAvaliable = table.Column<int>(type: "int", nullable: false),
+                    SKU = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProductManagement", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "StockManagement",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Cost = table.Column<float>(type: "real", nullable: false),
                     Quantity = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ProductManagement", x => x.Id);
+                    table.PrimaryKey("PK_StockManagement", x => x.Id);
                 });
         }
 
@@ -63,13 +76,16 @@ namespace IPMS.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "InventoryManagement");
+                name: "BillOfMaterials");
 
             migrationBuilder.DropTable(
                 name: "OrderManagement");
 
             migrationBuilder.DropTable(
                 name: "ProductManagement");
+
+            migrationBuilder.DropTable(
+                name: "StockManagement");
         }
     }
 }

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace IPMS.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    [Migration("20240220201913_UpdatingSystem")]
-    partial class UpdatingSystem
+    [Migration("20241219210720_UpdatingIDAgain")]
+    partial class UpdatingIDAgain
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -27,11 +27,11 @@ namespace IPMS.Migrations
 
             modelBuilder.Entity("IPMS.Models.EF.BillOfMaterials", b =>
                 {
-                    b.Property<int>("Cost")
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<int>("Id")
-                        .HasColumnType("int");
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -44,7 +44,9 @@ namespace IPMS.Migrations
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
-                    b.ToTable("BillOfMaterials");
+                    b.HasKey("Id");
+
+                    b.ToTable("BomManagement");
                 });
 
             modelBuilder.Entity("IPMS.Models.EF.OrderManagement", b =>
@@ -79,10 +81,6 @@ namespace IPMS.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int>("QuantityAvaliable")
                         .HasColumnType("int");
 
@@ -95,7 +93,7 @@ namespace IPMS.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("InventoryManagement");
+                    b.ToTable("ProductManagement");
                 });
 
             modelBuilder.Entity("IPMS.Models.EF.StockManagement", b =>
@@ -106,8 +104,8 @@ namespace IPMS.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<float>("Cost")
-                        .HasColumnType("real");
+                    b.Property<decimal>("Cost")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -118,7 +116,7 @@ namespace IPMS.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ProductManagement");
+                    b.ToTable("StockManagement");
                 });
 #pragma warning restore 612, 618
         }

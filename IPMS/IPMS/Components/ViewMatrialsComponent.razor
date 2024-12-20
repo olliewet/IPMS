@@ -1,17 +1,24 @@
 ﻿@using IPMS.Models.DTOs
 
-@foreach (var bom in Matrials)
-{
 
-    <div class="row">
-        <div class="col-5 col-md-3 text-end">Name :</div>
-        <div class="col-7 col-md-9">@bom.Name</div>
-    </div>
-    <div class="row">
-        <div class="col-5 col-md-3 text-end">Quantity:</div>
-        <div class="col-7 col-md-9">@bom?.Quantity</div>
-    </div>
-}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Quantity</th>     
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var bom in Matrials)
+        {
+                <tr>
+                <td>@bom.Name</td>
+                <td>@bom.Quantity</td>
+                </tr>
+        }
+        </tbody>
+    </table>
+
 @code {
 
     [Parameter] public List<BomDto> Matrials { get; set; } = new();

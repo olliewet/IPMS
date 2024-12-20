@@ -40,8 +40,8 @@
                 {
                     <tr>
                         <td>@stock.Name</td>
-                        <td> 
-                            <input class="form-control" type="number" @bind="@stock.QuantityForProduct" /> 
+                        <td>
+                            <input class="form-control" type="number" step="any" @bind="@stock.QuantityForProduct" />
                         </td>
                     </tr>
                 }
@@ -59,7 +59,7 @@
             <tr>
                 <th>SKU</th>
                 <th>Cost</th>
-                <th>Amount of Items Sold</th>
+                <th>Total Sold</th>
                 <th>Quantity</th>
                 <th>Matrials</th>
                 <th>Remove</th>
@@ -183,6 +183,6 @@
     {
         public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
-        public int QuantityForProduct{ get; set; }
+        public decimal QuantityForProduct{ get; set; }
     }
 }

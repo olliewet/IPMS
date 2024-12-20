@@ -5,7 +5,7 @@
 namespace IPMS.Migrations
 {
     /// <inheritdoc />
-    public partial class UpdatingDB : Migration
+    public partial class UpdatingIDBug : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
