@@ -10,47 +10,14 @@
 <h3>Add Product</h3>
 
 <Modal @ref="modal" />
-<button class="btn btn-primary" @onclick="() => ShowAddForm(!_ShowAddForm)">Add Product</button>
+<button class="btn btn-primary" @onclick="ShowAddProductComponent">Add Product</button>
 @if (errorMessage != "")
 {
     <div class="alert alert-info" role="alert">
         @errorMessage
     </div>
 }
-@if (_ShowAddForm)
-{
-    <form @onsubmit="HandleSubmit">
-        <div class="form-group">
-            <label>
-                SKU:
-                <input class="form-control" type="text" @bind="@Product.SKU" />
-            </label>
-        </div>
-        <br />
 
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Matrial Name</th>
-                    <th>Quantity Require</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var stock in StockForProduct)
-                {
-                    <tr>
-                        <td>@stock.Name</td>
-                        <td>
-                            <input class="form-control" type="number" step="any" @bind="@stock.QuantityForProduct" />
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>     
-        <br />
-        <button class="btn btn-primary" type="submit">Submit</button>
-    </form>
-}
 
 @if (Products.Count != 0)
 {
@@ -86,10 +53,9 @@
 }
 @code {
     List<ProductDto> Products = new();
-    List<StockDto> Stock = new();
-    List<AvaliableStock> StockForProduct = new();
-    List<AvaliableStock> SelectedStock = new();
     ProductDto Product { get; set; } = new ProductDto();
+    string errorMessage = "";
+
     private bool _ShowAddForm = false;
 
     protected override async Task OnInitializedAsync()
@@ -109,22 +75,6 @@
         await modal.HideAsync();
     }
 
-    async void UpdateAvaliableStock()
-    {
-        Stock = await stockService.GetAllStock();
-        StockForProduct = new();
-
-        foreach(var stock in Stock)
-        {
-            StockForProduct.Add(new()
-            {
-                Id = stock.Id,
-                Name = stock.Name
-            });
-        }
-    }
-
-
     async void RemoveProduct(ProductDto product)
     {
         await productService.RemoveProduct(product);
@@ -134,49 +84,24 @@
     async Task RefreshData()
     {
         Products = await productService.GetAllProducts();
-        UpdateAvaliableStock();
     }
-    public int Id { get; set; }
-    public string Name { get; set; } = string.Empty;
-    public int Quantity { get; set; }
-    public string ProductId { get; set; } = string.Empty; //Links to a product
-    string errorMessage = "";
-    
+
     void ShowAddForm(bool showForm)
     {
         _ShowAddForm = showForm;
         StateHasChanged();
     }
 
+    private async Task ShowAddProductComponent()
+    {    
+        await modal.ShowAsync<Components.AddProductComponent>(title: $"Add Product");
+    }
+    
     private async Task ShowMatrialsComponent(List<BomDto> matrials, string productName)
     {
         var parameters = new Dictionary<string, object>();
         parameters.Add("Matrials", matrials);
         await modal.ShowAsync<Components.ViewMatrialsComponent>(title: $"Matrials for {productName}", parameters: parameters);
-    }
-    async Task HandleSubmit()
-    {
-        SelectedStock = StockForProduct.Where(s => s.QuantityForProduct > 0).ToList();
-        foreach(var selected in SelectedStock)
-        {
-            Product.Materials.Add(new()
-                {
-                    Id = new(),
-                    Name = selected.Name,
-                    Quantity = selected.QuantityForProduct
-                });
-        }
-
-        var result = await productService.AddProduct(Product);
-        if (!result)
-        {
-            errorMessage = "Failed to Add Item";
-        }
-
-        Products = await productService.GetAllProducts();
-        Product = new ProductDto();
-        _ShowAddForm = false;
-        StateHasChanged();
     }
 
     public class AvaliableStock
