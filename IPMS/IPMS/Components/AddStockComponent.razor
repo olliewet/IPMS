@@ -1,0 +1,60 @@
+﻿@using IPMS.Data
+@using IPMS.Models.DTOs
+@using IPMS.Services
+@inject StockService StockService
+
+
+<form @onsubmit="HandleSubmit">
+    <div class="form-group">
+        <label>
+            Name:
+            <input class="form-control" type="text" @bind="@Stock.Name" />
+        </label>
+    </div>
+    <br />
+    <div class="form-group">
+        <label>
+            Quantity:
+            <input class="form-control" type="number" step="any" @bind="@Stock.Quantity" />
+        </label>
+    </div>
+    <br />
+    <div class="form-group">
+        <label>
+            Cost:
+            <input class="form-control" type="number" step="0.01" @bind="@Stock.Cost" />
+        </label>
+    </div>
+    <br />
+    <button class="btn btn-primary" type="submit">Submit</button>
+</form>
+
+@code {
+    StockDto Stock { get; set; } = new StockDto();
+    [Parameter] public EventCallback<string> OnClickCallback { get; set; }
+
+    string errorMessage = "";
+
+    // Method to handle form submission
+    async Task HandleSubmit()
+    {
+        if(string.IsNullOrEmpty(Stock.Name))
+        {
+            errorMessage = "Stock Name can not be empty!";
+        }
+        else
+        {
+            var result = await StockService.AddStockItem(Stock);
+            if (!result)
+            {
+                errorMessage = "Failed to Add Item";
+            }
+        }
+      
+        Stock = new StockDto();
+        await OnClickCallback.InvokeAsync(errorMessage);
+        StateHasChanged();
+    }
+
+
+}
