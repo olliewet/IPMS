@@ -43,7 +43,8 @@
     List<StockDto> Stock = new();
     ProductDto Product { get; set; } = new ProductDto();
     string errorMessage = "";
-    
+    [Parameter] public EventCallback<string> OnClickCallback { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
         await RefreshData();
@@ -92,6 +93,7 @@
 
         Products = await productService.GetAllProducts();
         Product = new ProductDto();
+        await OnClickCallback.InvokeAsync(errorMessage);
         StateHasChanged();
     }
 

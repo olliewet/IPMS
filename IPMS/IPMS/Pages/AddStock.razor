@@ -83,8 +83,6 @@
         {
             errorMessage = message;
             await modal.HideAsync();
-            //await modal.DisposeAsync();
-            //modal = default!;
             await RefreshData();
             StateHasChanged();
         }

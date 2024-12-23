@@ -93,10 +93,28 @@
     }
 
     private async Task ShowAddProductComponent()
-    {    
-        await modal.ShowAsync<Components.AddProductComponent>(title: $"Add Product");
+    {
+        var parameters = new Dictionary<string, object>
+        {
+            { "OnClickCallback", EventCallback.Factory.Create<string>(this, CloseModel) }
+        };
+        await modal.ShowAsync<Components.AddProductComponent>(title: $"Add Product", parameters: parameters);
     }
-    
+
+    private async Task CloseModel(string message)
+    {
+        try
+        {
+            errorMessage = message;
+            await modal.HideAsync();
+            await RefreshData();
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+
+        }
+    }
     private async Task ShowMatrialsComponent(List<BomDto> matrials, string productName)
     {
         var parameters = new Dictionary<string, object>();
