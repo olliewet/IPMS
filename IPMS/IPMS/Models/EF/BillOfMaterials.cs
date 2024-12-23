@@ -10,5 +10,6 @@ namespace IPMS.Models.EF
         public string Name { get; set; } = string.Empty;
         public decimal Quantity { get; set; }
         public string ProductId { get; set; } = string.Empty; //Links to a product 
+        public string StockId { get; set; } = string.Empty;
     }
 }

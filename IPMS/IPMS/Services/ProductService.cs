@@ -58,6 +58,7 @@ namespace IPMS.Services
                 foreach (var product in products)
                 {
                     product.Materials = await _bomRepo.GetAllBomsFromId(product.Id.ToString());
+                    product.Cost = await GetCost(product.Materials);
                 }
 
                 return products;
@@ -85,19 +86,20 @@ namespace IPMS.Services
                 return false;
             }
         }
-        private decimal GetCost(List<StockDto> stockDtos)
+        private async Task<decimal> GetCost(List<BomDto> matrials)
         {
             decimal totalCost = 0;
-            foreach (var stock in stockDtos)
+            var stock = await _stockRepo.GetAllStock();
+            foreach (var matrial in matrials)
             {
-                totalCost += stock.Cost;
+                var item = stock.FirstOrDefault(s => s.Id.ToString() == matrial.StockId);
+                if(item != null)
+                {
+                    totalCost += (item.Cost * matrial.Quantity);
+                }
             }
-            return totalCost;
+            return Math.Round(totalCost,2);
         }
-        //
-        private int GetQuantity(List<StockDto> stockDtos)
-        {
-            return 0;
-        }
+
     }
 }

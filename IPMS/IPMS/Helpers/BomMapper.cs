@@ -12,7 +12,8 @@ namespace IPMS.Helpers
             {
                 Name = ef.Name,
                 ProductId = ef.ProductId,
-                Quantity = ef.Quantity
+                Quantity = ef.Quantity,
+                StockId = ef.StockId
             };
         }
         public static BillOfMaterials GetEfromDto(BomDto dto)
@@ -22,7 +23,8 @@ namespace IPMS.Helpers
 
                 Name = dto.Name,
                 ProductId = dto.ProductId,
-                Quantity = dto.Quantity
+                Quantity = dto.Quantity,
+                StockId = dto.StockId
             };
         }
     }
