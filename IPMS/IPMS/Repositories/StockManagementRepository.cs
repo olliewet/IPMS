@@ -1,6 +1,7 @@
 ﻿using IPMS.Data;
 using IPMS.Helpers;
 using IPMS.Interfaces;
+using IPMS.Models.Classes;
 using IPMS.Models.DTOs;
 
 namespace IPMS.Repositories
@@ -43,6 +44,28 @@ namespace IPMS.Repositories
             catch (Exception ex) { }
             {
                 return result;
+            }
+        }
+
+        public async Task<bool> RemoveStockItem(StockDto stockDto)
+        {
+            try
+            {
+                var entity = await _context.StockManagement.FindAsync(stockDto.Id);
+
+                if (entity == null)
+                {
+                    // Handle the case where the entity does not exist
+                    return false;
+                }
+
+                _context.StockManagement.Remove(entity);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception ex) { }
+            {
+                return false;
             }
         }
 

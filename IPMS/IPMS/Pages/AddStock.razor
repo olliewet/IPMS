@@ -5,7 +5,7 @@
 @inject StockService StockService
 
 <PageTitle>Stock Inventory</PageTitle>
-<h3>AddStock</h3>
+<h3>Add Stock</h3>
 <Modal @ref="modal" />
 <button class="btn btn-primary" @onclick="ShowAddStockComponent">Add Stock</button>
 
@@ -26,6 +26,7 @@
                 <th>Name</th>
                 <th>Cost (£)</th>
                 <th>QTY</th>
+                <th>Remove</th>
             </tr>
         </thead>
         <tbody>
@@ -35,6 +36,9 @@
                     <td>@stockItem.Name</td>
                     <td>@stockItem.Cost</td>
                     <td>@stockItem.Quantity</td>
+                    <td>
+                        <button class="btn btn-danger" @onclick="() => RemoveStockDto(stockItem)">Remove</button>
+                    </td>
                 </tr>
             }
         </tbody>
@@ -48,7 +52,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        AvaliableStock = await StockService.GetAllStock();
+        await RefreshData();
     }
 
     private async Task ShowAddStockComponent()
@@ -61,18 +65,34 @@
             title: "Add Stock", parameters: parameters);
     }
 
-    private async Task GetStock()
+    private async Task RefreshData()
     {
         AvaliableStock = await StockService.GetAllStock();
     }
 
+    async void RemoveStockDto(StockDto stockDto)
+    {
+        await StockService.RemoveStockItem(stockDto);
+        await RefreshData();
+        StateHasChanged();
+    }
+
     private async Task CloseModel(string message)
     {
-        errorMessage = message;
-        await modal.HideAsync();
-        await modal.DisposeAsync();
-        await GetStock();
-        StateHasChanged();
+        try
+        {
+            errorMessage = message;
+            await modal.HideAsync();
+            //await modal.DisposeAsync();
+            //modal = default!;
+            await RefreshData();
+            StateHasChanged();
+        }
+        catch(Exception ex)
+        {
+            
+        }
+       
     }
 
 }

@@ -23,6 +23,17 @@ namespace IPMS.Services
                 return false;
             }              
         }
+        public async Task<bool> RemoveStockItem(StockDto StockItem)
+        {
+            try
+            {
+                return await _stockRepo.RemoveStockItem(StockItem);
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
         public async Task<bool> UpdateStockItem(StockDto StockItem)
         {
             try
