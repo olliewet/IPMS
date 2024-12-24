@@ -1,0 +1,45 @@
+﻿@using IPMS.Models.DTOs
+@using IPMS.Services
+@inject ProductService productService
+
+<form @onsubmit="HandleSubmit">
+    <div class="form-group">
+        <label>
+            Total Sold:
+            <input class="form-control" type="text" @bind="@ProductDto.QuantitySold" />
+        </label>
+    </div>
+    <br />
+    <div class="form-group">
+        <label>
+            Quantity Avaliable:
+            <input class="form-control" type="number" step="any" @bind="@ProductDto.QuantityAvaliable" />
+        </label>
+    </div>
+    <br />
+    <button class="btn btn-primary" type="submit">Submit</button>
+</form>
+@code {
+    [Parameter] public ProductDto ProductDto { get; set; } = new();
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+    }
+
+    [Parameter] public EventCallback<string> OnClickCallback { get; set; }
+
+    string errorMessage = "";
+
+    // Method to handle form submission
+    async Task HandleSubmit()
+    {
+        var result = await productService.UpdateProductItem(ProductDto);
+        if (!result)
+        {
+            errorMessage = "Failed to Update Product";
+        }
+        await OnClickCallback.InvokeAsync(errorMessage);
+        StateHasChanged();
+    }
+}

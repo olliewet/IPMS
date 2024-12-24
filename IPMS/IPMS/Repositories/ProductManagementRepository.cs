@@ -87,8 +87,23 @@ namespace IPMS.Repositories
         {
             try
             {
-                _context.ProductManagement.Update(ProductMapper.GetEfromDto(product));
+                var entity = await _context.ProductManagement.FindAsync(product.Id);
+
+                if (entity == null)
+                {
+                    // Handle the case where the entity does not exist
+                    return false;
+                }
+                
+                entity.QuantitySold = product.QuantitySold;
+                entity.QuantityAvaliable = product.QuantityAvaliable;
+
+                // Remove the entity
+                _context.ProductManagement.Update(entity);
+
+                // Save changes to the database
                 await _context.SaveChangesAsync();
+
                 return true;
             }
             catch (Exception ex) { }

@@ -29,6 +29,7 @@
                 <th>Total Sold</th>
                 <th>Quantity</th>
                 <th>Matrials</th>
+                <th>Modify</th>
                 <th>Remove</th>
             </tr>
         </thead>
@@ -42,6 +43,9 @@
                     <td>@productDto.QuantityAvaliable</td>
                     <td>
                         <button class="btn btn-primary" @onclick="() => ShowMatrialsComponent(productDto.Materials,productDto.SKU)">View</button>
+                    </td>
+                    <td>
+                        <button class="btn btn-success" @onclick="() => ShowModifyProductComponent(productDto)">Modify</button>
                     </td>
                     <td>
                         <button class="btn btn-danger" @onclick="() => RemoveProduct(productDto)">Remove</button>
@@ -100,7 +104,15 @@
         };
         await modal.ShowAsync<Components.AddProductComponent>(title: $"Add Product", parameters: parameters);
     }
-
+    private async Task ShowModifyProductComponent(ProductDto productDto)
+    {
+        var parameters = new Dictionary<string, object>
+        {
+            { "OnClickCallback", EventCallback.Factory.Create<string>(this, CloseModel) },
+            { "ProductDto", productDto }
+        };
+        await modal.ShowAsync<Components.ModifyComponent>(title: $"Modify {productDto.SKU}", parameters: parameters);
+    }
     private async Task CloseModel(string message)
     {
         try
