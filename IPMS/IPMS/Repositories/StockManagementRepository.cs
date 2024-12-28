@@ -69,12 +69,27 @@ namespace IPMS.Repositories
             }
         }
 
-        public async Task<bool> UpdateStockItem(StockDto product)
+        public async Task<bool> UpdateStockItem(StockDto stock)
         {
             try
             {
-                _context.StockManagement.Update(StockMapper.GetEfromDto(product));
+                var entity = await _context.StockManagement.FindAsync(stock.Id);
+
+                if (entity == null)
+                {
+                    // Handle the case where the entity does not exist
+                    return false;
+                }
+
+                entity.Quantity = stock.Quantity;
+                entity.Cost = stock.Cost;
+
+                // Remove the entity
+                _context.StockManagement.Update(entity);
+
+                // Save changes to the database
                 await _context.SaveChangesAsync();
+
                 return true;
             }
             catch (Exception ex) { }
