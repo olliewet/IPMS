@@ -78,19 +78,31 @@ namespace IPMS.Repositories
                 return false;
             }
         }
-
         public async Task<bool> UpdateBom(BomDto bom)
         {
             try
             {
-                _context.BomManagement.Update(BomMapper.GetEfromDto(bom));
+                var entity = await _context.BomManagement.FindAsync(bom.Id);
+
+                if (entity == null)
+                {
+                    // Handle the case where the entity does not exist
+                    return false;
+                }
+                
+                entity.Quantity = bom.Quantity;         
+                _context.BomManagement.Update(entity);
+
+                // Save changes to the database
                 await _context.SaveChangesAsync();
+
                 return true;
             }
             catch (Exception ex) { }
             {
                 return false;
             }
+   
         }
     }
 }

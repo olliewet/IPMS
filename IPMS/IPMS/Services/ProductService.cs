@@ -21,10 +21,10 @@ namespace IPMS.Services
             try
             {
                 var id = await _productRepo.AddProduct(productItem);
-                foreach(var matrial in productItem.Materials)
-                {            
-                    matrial.ProductId = id.ToString();
-                    await _bomRepo.AddBom(matrial);
+                foreach(var material in productItem.Materials)
+                {
+                    material.ProductId = id.ToString();
+                    await _bomRepo.AddBom(material);
                 }
                 return true;
             }
@@ -90,12 +90,12 @@ namespace IPMS.Services
         {
             decimal totalCost = 0;
             var stock = await _stockRepo.GetAllStock();
-            foreach (var matrial in matrials)
+            foreach (var material in matrials)
             {
-                var item = stock.FirstOrDefault(s => s.Id.ToString() == matrial.StockId);
+                var item = stock.FirstOrDefault(s => s.Id.ToString() == material.StockId);
                 if(item != null)
                 {
-                    totalCost += (item.Cost * matrial.Quantity);
+                    totalCost += (item.Cost * material.Quantity);
                 }
             }
             return Math.Round(totalCost,2);

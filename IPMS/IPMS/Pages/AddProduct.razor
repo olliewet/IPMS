@@ -129,8 +129,12 @@
     }
     private async Task ShowMatrialsComponent(List<BomDto> matrials, string productName)
     {
-        var parameters = new Dictionary<string, object>();
-        parameters.Add("Matrials", matrials);
+        var parameters = new Dictionary<string, object>
+        {
+            { "OnClickCallback", EventCallback.Factory.Create<string>(this, CloseModel) },
+            { "Matrials", matrials }
+        };
+ 
         await modal.ShowAsync<Components.ViewMatrialsComponent>(title: $"Matrials for {productName}", parameters: parameters);
     }
 

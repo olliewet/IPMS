@@ -1,6 +1,7 @@
 ﻿@using IPMS.Models.DTOs
-
-
+@using IPMS.Services
+@inject BomService BomService
+<form @onsubmit="HandleSubmit">
     <table class="table">
         <thead>
             <tr>
@@ -12,19 +13,33 @@
         @foreach (var bom in Matrials)
         {
                 <tr>
-                <td>@bom.Name</td>
-                <td>@bom.Quantity</td>
+                    <td>  <input type="text" readonly class="form-control-plaintext" @bind="@bom.Name"></td>
+                    <td>   <input type="number" step="any" class="form-control" @bind="@bom.Quantity" /></td>
                 </tr>
         }
         </tbody>
     </table>
-
+    <button class="btn btn-primary" type="submit">Submit</button>
+</form>
 @code {
 
     [Parameter] public List<BomDto> Matrials { get; set; } = new();
+    string errorMessage = "";
+    [Parameter] public EventCallback<string> OnClickCallback { get; set; }
 
     protected override void OnInitialized()
     {
         base.OnInitialized();
+    }
+    async Task HandleSubmit()
+    {
+        var result = await BomService.UpdateListOfMatrials(Matrials);
+      
+        if (!result)
+        {
+            errorMessage = "Failed to Update Matrial";
+        }
+        await OnClickCallback.InvokeAsync(errorMessage);
+        StateHasChanged();
     }
 }

@@ -1,0 +1,45 @@
+﻿@using IPMS.Models.DTOs
+@using IPMS.Services
+@inject StockService stockService
+
+<form @onsubmit="HandleSubmit">
+    <div class="form-group">
+        <label>
+            Quantity:
+            <input class="form-control" type="number" step="any" @bind="@StockDto.Quantity" />
+        </label>
+    </div>
+    <br />
+    <div class="form-group">
+        <label>
+            Cost:
+            <input class="form-control" type="number" step="0.01" @bind="@StockDto.Cost" />
+        </label>
+    </div>
+    <br />
+    <button class="btn btn-primary" type="submit">Submit</button>
+</form>
+@code {
+    [Parameter] public StockDto StockDto { get; set; } = new();
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+    }
+
+    [Parameter] public EventCallback<string> OnClickCallback { get; set; }
+
+    string errorMessage = "";
+
+    // Method to handle form submission
+    async Task HandleSubmit()
+    {
+        var result = await stockService.UpdateStockItem(StockDto);
+        if (!result)
+        {
+            errorMessage = "Failed to Update Stock";
+        }
+        await OnClickCallback.InvokeAsync(errorMessage);
+        StateHasChanged();
+    }
+}

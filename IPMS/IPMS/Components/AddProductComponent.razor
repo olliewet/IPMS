@@ -5,6 +5,8 @@
 @inject StockService stockService
 
 <form @onsubmit="HandleSubmit">
+
+
     <div class="form-group">
         <label>
             SKU:
@@ -12,16 +14,19 @@
         </label>
     </div>
     <br />
-
+    <div class="form-group">
+        <input class="form-control" type="text" @bind="SearchTerm" @oninput="(e => SearchTerm = e.Value?.ToString() ?? string.Empty)" placeholder="Search by Materialname..." />
+    </div>
+    <br />
     <table class="table">
         <thead>
             <tr>
-                <th>Matrial Name</th>
+                <th>MaterialName</th>
                 <th>Quantity Require</th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var stock in StockForProduct)
+            @foreach (var stock in FilteredStock)
             {
                 <tr>
                     <td>@stock.Name</td>
@@ -42,9 +47,13 @@
     List<AvaliableStock> StockForProduct = new();
     List<StockDto> Stock = new();
     ProductDto Product { get; set; } = new ProductDto();
+    private string SearchTerm { get; set; } = string.Empty;
     string errorMessage = "";
     [Parameter] public EventCallback<string> OnClickCallback { get; set; }
-
+    
+    private IEnumerable<AvaliableStock> FilteredStock => string.IsNullOrWhiteSpace(SearchTerm)
+        ? StockForProduct
+    : StockForProduct.Where(stock => stock.Name.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase));
     protected override async Task OnInitializedAsync()
     {
         await RefreshData();

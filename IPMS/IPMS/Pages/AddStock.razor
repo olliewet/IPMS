@@ -26,6 +26,7 @@
                 <th>Name</th>
                 <th>Cost (£)</th>
                 <th>QTY</th>
+                <th>Modify</th>
                 <th>Remove</th>
             </tr>
         </thead>
@@ -36,6 +37,9 @@
                     <td>@stockItem.Name</td>
                     <td>@stockItem.Cost</td>
                     <td>@stockItem.Quantity</td>
+                    <td>
+                        <button class="btn btn-success" @onclick="() => ShowModifyStockComponent(stockItem)">Modify</button>
+                    </td>
                     <td>
                         <button class="btn btn-danger" @onclick="() => RemoveStockDto(stockItem)">Remove</button>
                     </td>
@@ -64,7 +68,16 @@
         await modal.ShowAsync<Components.AddStockComponent>(
             title: "Add Stock", parameters: parameters);
     }
-
+    private async Task ShowModifyStockComponent(StockDto stockDto)
+    {
+        var parameters = new Dictionary<string, object>
+        {
+            { "OnClickCallback", EventCallback.Factory.Create<string>(this, CloseModel) },
+            { "StockDto", stockDto }
+        };
+        await modal.ShowAsync<Components.ModifyStockComponent>(
+            title: "Modify Stock", parameters: parameters);
+    }
     private async Task RefreshData()
     {
         AvaliableStock = await StockService.GetAllStock();
